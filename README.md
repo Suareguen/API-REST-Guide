@@ -198,12 +198,6 @@ const { connection } = require('../../databse/index');
 
 // Definimos un modelo 'User' usando el objeto connection que se refiere a la tabla 'user' en la base de datos
 const User = connection.define('user', {
-  // Definimos una columna 'userId' como clave primaria que se autoincrementa
-  userId: {
-    type: DataTypes.INTEGER, // Establece el tipo de dato como entero
-    primaryKey: true, // Marca la columna como clave primaria
-    autoIncrement: true // Habilita el autoincremento para esta columna
-  },
   // Definimos una columna 'name' para almacenar el nombre del usuario
   name: {
     type: DataTypes.STRING // Establece el tipo de dato como cadena de texto
