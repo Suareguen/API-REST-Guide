@@ -77,7 +77,7 @@ Una vez que tenemos abierto nuestro editor de texto procedemos a seleccionar el 
   const initializeAnListenExpress = () => {
   try {
     app.use(express.json())
-      .use(cors)
+      .use(cors())
       .use(morgan('dev'))
       .listen(3000, () => {
       console.log('Server started')
