@@ -112,4 +112,110 @@ Imagen
 Ya tenemos nuestro servidor a la escucha!!!!
 
 
+### Conexión a la base de datos
+
+Para ello primero en el archivo ```index.js``` de la carpeta **database** creamos la conexión a la base de datos, a través de la instacia de ```Sequelize``` que importamos del paquete que ya hemos instalado y deberíamos tener algo como esto: 
+
+**IMPORTANTE:** En Table Plus crear la base de datos antes de realizar la conxión a la base de datos.
+
+```js
+// Importamos Sequelize desde el módulo sequelize, que es necesario para crear la conexión con la base de datos
+const { Sequelize } = require('sequelize');
+
+// Creamos una nueva instancia de Sequelize para manejar la conexión con una base de datos MySQL, es decir, establecemos las credenciales y demás opciones necesarias para la conexión
+const connection = new Sequelize('npmbreDeLaBasedeDatos', 'usuario', 'contraseña', {
+  host: 'localhost', // Dirección del servidor de la base de datos
+  dialect: 'mysql', // Especificamos que usaremos MySQL como el sistema de gestión de base de datos
+  port: 3306,       // Puerto por el que se conecta al servidor MySQL, 3306 es el predeterminado para MySQL
+  logging: false    // Desactivamos el logging para no mostrar los detalles de las consultas SQL en la consola
+});
+```
+
+Seguidamente una vez que tenemos la conexión a ka base de datos podemos usar métodos asociados a dicha instacia como el ```authenticate``` para realizar la conexión a la base de datos y autenticación y deberíamos tener algo como esto: 
+
+```js
+const checkDb = async () => {
+  try {
+    await connection.authenticate()
+    console.log('Connection to DB succesfull')
+  } catch (error) {
+    console.log(error)
+  }
+}
+```
+
+Solo nos queda importar al final de nuestro archivo la función que hemos creado y la instacia de la conexión con nuestra base de datos de la siguiente manera:
+
+```js
+module.exports = {
+  checkDb,
+  connection
+```
+
+Y se nos debería quedar una archivo así:
+
+Imagen
+
+Para finalizar nos quedaría ir a nuestro archivo ```index.js``` principal y creamos una función ```checkAndSyncMySQL``` para realizar nuestra conexión a la base de datos de una manera más unificada (esto de cara a futuro) y deberíamos tener algo así:
+
+```js
+async function checkAndSyncMySQL() {
+    try {
+          await checkConnection()
+    } catch (error) {
+        throw error
+    }
+}
+```
+Ejecutamos esta función en la función ```startAPI``` antes de la inicialización de ```express``` y se nos debería quedar así:
+
+```js
+const startApi = async () => {
+  try {
+    await checkAndSyncMySQL()
+    initializeExpressAndListen()
+  } catch (error) {
+    console.log(error)
+  }
+}
+```
+
+Y si todo va bien deberíamos tener ya la conexión con la base de datos hecha.
+
+## Creación de modelos
+
+En este apartado pasaremos a crear los 4 modelos que especificamos al inicio del proyecto que serán: user, comments, tweets y contactInfo.
+
+Para ello en la carpeta de ```models``` creada anteriormente creamos el archivo ```user.model.js``` y dentro del mismo tendríamos algo como esto: 
+
+```js
+// Importamos DataTypes desde el módulo sequelize para definir tipos de columnas en la base de datos
+const { DataTypes } = require('sequelize');
+
+// Importamos el objeto connection desde una ruta relativa, que maneja la conexión con nuestra base de datos
+const { connection } = require('../../databse/index');
+
+// Definimos un modelo 'User' usando el objeto connection que se refiere a la tabla 'user' en la base de datos
+const User = connection.define('user', {
+  // Definimos una columna 'userId' como clave primaria que se autoincrementa
+  userId: {
+    type: DataTypes.INTEGER, // Establece el tipo de dato como entero
+    primaryKey: true, // Marca la columna como clave primaria
+    autoIncrement: true // Habilita el autoincremento para esta columna
+  },
+  // Definimos una columna 'name' para almacenar el nombre del usuario
+  name: {
+    type: DataTypes.STRING // Establece el tipo de dato como cadena de texto
+  }
+},
+{
+  // Configuración adicional para el modelo
+  timestamps: false // Desactiva la creación automática de las columnas 'createdAt' y 'updatedAt'
+});
+
+// Exportamos el modelo 'User' para poder usarlo en otras partes de la aplicación
+module.exports = User;
+``` 
+
+
 
