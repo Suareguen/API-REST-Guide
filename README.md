@@ -150,6 +150,7 @@ Solo nos queda importar al final de nuestro archivo la función que hemos creado
 module.exports = {
   checkDb,
   connection
+}
 ```
 
 Y se nos debería quedar una archivo así:
