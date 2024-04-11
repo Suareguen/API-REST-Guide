@@ -1,8 +1,8 @@
 # API-REST-Guide
 
-![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](https://myoctocat.com/assets/images/base-octocat.svg)
-
 Pequeña guía de como debemos afrontar la creación de una API REST para una red social al estilo de la antigua Twitter. Tendremos tres modelos (entidades o tablas) en nuestra API que serán las de: usuario, tweets, informacion de contacto del usuario (contactInfo) y comentarios. Al disponer de 4 modelos de inicio podemos definir que tendremos 4 controladores y 4 rutas asociadas a cada uno de los modelos. En caso de tener mas modelos o menos ajustaríamos ese numero, para 3 modelos tres controladores y 3 rutas, etc. Esto sería establecido de inicio a no ser que se especificase lo contrario al inicio del proyecto, ya cada proyecto tiene su propio contexto, objetivos y metodologías, pero podemos decir que en nuestro caso al tener 4 modelos disponemos de 4 rutas y 4 controladores.
+
+**Añadir ```.gitignre```**
 
 ## **Index**
 
@@ -185,9 +185,16 @@ Y se nos debería quedar una archivo así:
 
 Imagen
 
-Para finalizar nos quedaría ir a nuestro archivo ```index.js``` principal y creamos una función ```checkAndSyncMySQL``` para realizar nuestra conexión a la base de datos de una manera más unificada (esto de cara a futuro) y deberíamos tener algo así:
+Para finalizar nos quedaría ir a nuestro archivo ```index.js``` principal, nos importamos las funciones que acabamos de crear y creamos una función ```checkAndSyncMySQL``` para realizar nuestra conexión a la base de datos de una manera más unificada (esto de cara a futuro) y deberíamos tener algo así:
 
 ```js
+
+const {
+  connection,
+  checkDb,
+  syncModels
+} = require('./database/index.js')
+
 async function checkAndSyncMySQL() {
     try {
           await checkConnection()
@@ -212,6 +219,8 @@ const startApi = async () => {
 Y si todo va bien deberíamos tener ya la conexión con la base de datos hecha.
 
 ## Creación de modelos
+
+### Definición de modelos
 
 En este apartado pasaremos a crear los 4 modelos que especificamos al inicio del proyecto que serán: user, comments, tweets y contactInfo.
 
@@ -302,4 +311,53 @@ const ContactInfo = connection.define('contactinfo', {
 module.exports = ContactInfo
 ```
 
+### Sincroización de modelos en la BBDD
 
+Una vez que tenemos nuestros modelos ya definido los que nos queda es que los mismos se nos creen en la base de datos, para ello necesitamos volver al achivo ```index.js``` que se encuentra en la carpeta **database**. Una vez que estemos en dicho archivo añadimos la siguiente función que por medio del método ```sync``` podremos sincronizar os modelos con la base de datos. Por lo tanto deberíamos añadir esta función en dicho archivo:
+
+```js
+const syncModels = async () => {
+  try {
+    await connection.sync()
+    console.log('Models added')
+  } catch (error) {
+    console.log(error)
+  }
+}
+```
+Anotar los valores de alter y force
+
+Y por último lo exportamos al final del archivo:
+
+```js
+module.exports = {
+  connection,
+  checkDb,
+  syncModels
+}
+```
+
+Ahora vamos al archivo ```index.js```principal, es decir, el que estña en nuestra carpeta raź o principal y en donde antes nos imprtabamos la funcion ```checkDb``` y la instancia ```connection```, añadimos esta nueva función y además la ejecutamos dentro de la función ```checkAndSyncMySQL``` y se nos debería quedar algo así:
+
+```js
+
+const {
+  connection,
+  checkDb,
+  syncModels
+} = require('./database/index.js')
+
+async function checkAndSyncMySQL() {
+    try {
+          await checkConnection()
+          await syncModels()
+    } catch (error) {
+        throw error
+    }
+}
+```
+
+Una vez hemos añadido dicha función volvemos a arrancar nuestro servidor por medio de ```node --watch index.js```.
+Debería salirnos por consola algo asi:
+
+![consola](/home/suarenguen/code/API-REST-Guide/images/serverStarted.png)
