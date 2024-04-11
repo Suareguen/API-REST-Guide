@@ -70,6 +70,10 @@ En la ruta que estamos creamos 2 carpetas por medio del siguiente comando en ter
 mkdir api database
 ```
 
+```bash
+touch .gitignore
+```
+
 Ahora creamos nuestro archivo principal y que será la entrada a nuestra API por medio del siguiente comando:
 
 ```bash
