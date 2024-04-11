@@ -4,6 +4,12 @@
 
 Pequeña guía de como debemos afrontar la creación de una API REST para una red social al estilo de la antigua Twitter. Tendremos tres modelos (entidades o tablas) en nuestra API que serán las de: usuario, tweets, informacion de contacto del usuario (contactInfo) y comentarios. Al disponer de 4 modelos de inicio podemos definir que tendremos 4 controladores y 4 rutas asociadas a cada uno de los modelos. En caso de tener mas modelos o menos ajustaríamos ese numero, para 3 modelos tres controladores y 3 rutas, etc. Esto sería establecido de inicio a no ser que se especificase lo contrario al inicio del proyecto, ya cada proyecto tiene su propio contexto, objetivos y metodologías, pero podemos decir que en nuestro caso al tener 4 modelos disponemos de 4 rutas y 4 controladores.
 
+## **Index**
+
+
+  - [Inicio de proyecto](#Inicio-de-proyecto)
+  - [Creación de modelos](#Creación-de-modelos)
+
 
 ## Inicio de proyecto
 
@@ -19,16 +25,36 @@ Accedemos a ella ahora:
 ```bash
 cd API-REST
 ```
-Ahora una vez que estamos en nuestro proyecto creamos nuestro package.json para poder instalar los pequetes (librerias) que vayamos a usar en nuestro proyecto por medio del siguiente comando estando en la ruta que estamos: 
+Ahora una vez que estamos en nuestro proyecto creamos nuestro package.json para poder instalar los pequetes (librerias) que vayamos a usar en nuestro proyecto por medio del siguiente comando estando en la ruta que estamos:
 
 ```bash
 npm init -y
 ```
-Este comando nos creará el package.json y al poner ```-y``` damos unos valores por defecto que nos debería mostrar algo como esto: 
+Este comando nos creará el package.json y al poner ```-y``` damos unos valores por defecto que nos debería mostrar algo como esto por consola:
 
-imagen aqui
+```js
+{
+  "name": "sequelize-relations",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.9.4",
+    "sequelize": "^6.37.2"
+  }
+}
+```
 
-Ahora una vez que ya tenemos nuestro package.json podemos instalar los paquetes (librerias) que vayamos a usar en nuestra aplicación que en nuestro caso serán 
+Ahora una vez que ya tenemos nuestro package.json podemos instalar los paquetes (librerias) que vayamos a usar en nuestra aplicación que en nuestro caso serán
 : mysql2, sequelize, express, morgan, cors, jsonwebtoken, bcrypt. dichos paquetes los instalamos de la siguente introduciendo en nuestra terminal:
 
 ```bash
@@ -37,7 +63,7 @@ npm install mysql2 sequelize express morgan cors jsonwebtoken bcrypt
 
 Una vez tenemos todo instalado pasamos a crear las carpetas y archivos que vamos a necesitar en nuestro proyecto.
 
-En la ruta que estamos creamos 2 carpetas por medio del siguiente comando en terminal: 
+En la ruta que estamos creamos 2 carpetas por medio del siguiente comando en terminal:
 
 ```bash
 mkdir api database
@@ -99,7 +125,7 @@ Una vez que tenemos abierto nuestro editor de texto procedemos a seleccionar el 
     console.log(error)
   }
   }
-  
+
   startApi()
   ```
 
@@ -116,7 +142,7 @@ Ya tenemos nuestro servidor a la escucha!!!!
 
 ### Conexión a la base de datos
 
-Para ello primero en el archivo ```index.js``` de la carpeta **database** creamos la conexión a la base de datos, a través de la instacia de ```Sequelize``` que importamos del paquete que ya hemos instalado y deberíamos tener algo como esto: 
+Para ello primero en el archivo ```index.js``` de la carpeta **database** creamos la conexión a la base de datos, a través de la instacia de ```Sequelize``` que importamos del paquete que ya hemos instalado y deberíamos tener algo como esto:
 
 **IMPORTANTE:** En Table Plus crear la base de datos antes de realizar la conxión a la base de datos.
 
@@ -133,7 +159,7 @@ const connection = new Sequelize('npmbreDeLaBasedeDatos', 'usuario', 'contraseñ
 });
 ```
 
-Seguidamente una vez que tenemos la conexión a ka base de datos podemos usar métodos asociados a dicha instacia como el ```authenticate``` para realizar la conexión a la base de datos y autenticación y deberíamos tener algo como esto: 
+Seguidamente una vez que tenemos la conexión a ka base de datos podemos usar métodos asociados a dicha instacia como el ```authenticate``` para realizar la conexión a la base de datos y autenticación y deberíamos tener algo como esto:
 
 ```js
 const checkDb = async () => {
@@ -189,7 +215,7 @@ Y si todo va bien deberíamos tener ya la conexión con la base de datos hecha.
 
 En este apartado pasaremos a crear los 4 modelos que especificamos al inicio del proyecto que serán: user, comments, tweets y contactInfo.
 
-Para ello en la carpeta de ```models``` creada anteriormente creamos el archivo ```user.model.js``` y dentro del mismo tendríamos algo como esto: 
+Para ello en la carpeta de ```models``` creada anteriormente creamos el archivo ```user.model.js``` y dentro del mismo tendríamos algo como esto:
 
 ```js
 // Importamos DataTypes desde el módulo sequelize para definir tipos de columnas en la base de datos
@@ -212,7 +238,68 @@ const User = connection.define('user', {
 
 // Exportamos el modelo 'User' para poder usarlo en otras partes de la aplicación
 module.exports = User;
-``` 
+```
 
+El resto de modelos siguiendo la misma estructura deberían quedarnos algo así:
+
+**Tweet**
+
+```js
+const { DataTypes } = require('sequelize')
+const { connection } = require('../../databse/index')
+
+
+const Tweet = connection.define('tweet', {
+  comment: {
+    type: DataTypes.STRING
+  }
+},
+  {
+    timestamps: false
+  }
+)
+
+module.exports = Tweet
+```
+
+**Class**
+
+```js
+const { DataTypes } = require('sequelize')
+const { connection } = require('../../databse/index')
+
+
+const Class = connection.define('class', {
+  name: {
+    type: DataTypes.STRING
+  }
+},
+  {
+    timestamps: false
+  }
+)
+
+module.exports = Class
+```
+
+**ContactInfo**
+
+```js
+const { DataTypes } = require('sequelize')
+const { connection } = require('../../databse/index')
+
+
+const ContactInfo = connection.define('contactinfo', {
+  address: {
+    type: DataTypes.STRING
+  }
+},
+  {
+    timestamps: false
+  }
+)
+
+module.exports = ContactInfo
+```
 
 
