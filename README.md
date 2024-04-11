@@ -9,6 +9,7 @@ Pequeña guía de como debemos afrontar la creación de una API REST para una re
 
   - [Inicio de proyecto](#Inicio-de-proyecto)
   - [Creación de modelos](#Creación-de-modelos)
+  - [Creación de controladores, CRUD básico y rutas correspondientes](#Creación-de-controladores-,-CRUD-básico,y-rutas-correspondientes)
 
 
 ## Inicio de proyecto
@@ -357,7 +358,59 @@ async function checkAndSyncMySQL() {
 }
 ```
 
-Una vez hemos añadido dicha función volvemos a arrancar nuestro servidor por medio de ```node --watch index.js```.
-Debería salirnos por consola algo asi:
+Solo nos quedaría ahora ir al archivo ```relations.js``` y añadir dentro una función que en un futuro nos servirá para hacr las relaciones de nuestras tablas o entidades, por ahora solo nos centraremos en importar a este archivo los modelos que tenemos creados y tendríamos un archivo que tendría la siguiente estrutura:
 
-![consola](/home/suarenguen/code/API-REST-Guide/images/serverStarted.png)
+```js
+const User = require('../api/models/user.model.js')
+const Tweet = require('../api/models/tweets.model.js')
+const ContactInfo = require('../api/models/contact_info.model.js')
+const Class = require('../api/models/classes.model.js')
+const UserClass = require('../api/models/user_class.model.js')
+
+const initializeRelations = () => {
+  try {
+    //here the relations
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+module.exports = initializeRelations
+```
+Esta función nos la importamos en nustro ```index.js``` principal de la siguiente manera:
+
+```js
+const initializeRelations = require('./database/relations.js')
+```
+
+Ahora ejecutamos dicha función en la función ```checkAndSyncMySQL``` y se nos deberia quedar algo así:
+
+```js
+async function checkAndSyncMySQL() {
+    try {
+          await checkConnection()
+          initializeRelations()
+          await syncModels()
+    } catch (error) {
+        throw error
+    }
+}
+```
+Una vez hemos añadido dicha función volvemos a arrancar nuestro servidor por medio de ```node --watch index.js```.
+Debería salirnos por consola algo asi por consola:
+
+![consola con el servidor arrancado y las sincronizaciones hechas](/home/suarenguen/code/API-REST-Guide/images/serverStarted.png)
+
+Y además si abrimos Table Plus deberían aparecernos las tablas ya definidas en nuestra base de datos de esta manera:
+
+Imagen de table plus
+
+
+## Creación de controladores, CRUD básico y rutas correspondientes
+
+Pasaremos ahora a crear un CRUD básico para nuestro modelo de ```User```, primero vamos a definir una ruta básica hacia nuestro controlador de usuario, para ello dentro de la carpeta ```api``` tendremos la carpeta ```controllers```, en dicha carpeta creamos un archivo ```user.controller.js``` y dentro del mismo antes que nada nos importamos el modelo del usuario de la siguiente manera:
+
+```js
+const User = require('../models/user.model.js')
+```
+ Por ahora solo tendremos esto, vamos a establecer la ruta hacia este controlador y poder manejar las peticiones que hagamos a nuestro recurso(tabla o entidad) en nuestra BBDD.
