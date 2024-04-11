@@ -413,4 +413,85 @@ Pasaremos ahora a crear un CRUD básico para nuestro modelo de ```User```, prime
 ```js
 const User = require('../models/user.model.js')
 ```
- Por ahora solo tendremos esto, vamos a establecer la ruta hacia este controlador y poder manejar las peticiones que hagamos a nuestro recurso(tabla o entidad) en nuestra BBDD.
+ Por ahora solo tendremos esto, vamos a establecer la ruta hacia este controlador y poder manejar las peticiones que hagamos a nuestro recurso (tabla o entidad) en nuestra BBDD.
+
+### Rutas
+
+Nos dirijimos a nuestra carpeta ```routes``` creada dentro de la carpeta ```api``` y en dicha capeta creamos un archivo que se llamará ```index.js```, en dicho archivo lo que haremos será lo siguiente:
+
+```js
+// Importamos el módulo de enrutamiento de Express y creamos un enrutador.
+const router = require('express').Router();
+
+// Usamos el enrutador para manejar todas las peticiones dirigidas a '/user' usando el enrutador definido en 'user.router'.
+router.use('/user', require('./user.router'));
+
+// Exportamos el enrutador para que pueda ser utilizado por otros archivos en nuestra aplicación.
+module.exports = router;
+```
+Una vez que tenemos esto creamos en la misma carpeta un archivo ```user.router.js``` en donde manejaremos las peticiones relacionadas con el usuario.
+
+En nuestro nuevo archivo estableceremos la siguiente estructura:
+
+```js
+const router = require('express').Router()
+
+router.get('', (request, response) => {
+  console.log('holi')
+  return response.status(200).json({ message: 'ete controlador funciona correctamente'})
+})
+
+module.exports = router
+```
+
+por ahora el segundo parámetro que pasamos al método ```get``` es una función callback añadida directamente, pero la idea es crear ahora en el controlador de usuario una función que ejcutemos en vez de esta que me hemos escrito directamente.
+
+Por ello ahroa iremos al ```user.controller.js``` y en el mismo creamos la siguiente función:
+
+```js
+const User = require('../models/user.model')
+
+const getAllUsers = async (request, response) => {
+  try {
+    const users = await User.findAll()
+    return response-status(200).json(users)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// Exportamos la función que hemos creado
+
+module.exports = {
+  getOneUser
+}
+```
+
+Nos volvemos a nuestro ```user.router.js```, nos importamos la función que acabamos de crear y la añadimos en donde antes teníamos la función callbak que habiamos creado de inicio quedándonos algo así:
+
+```js
+const router = require('express').Router()
+const { getAllUsers } = require('../controllers/user.controller.js')
+router.get('', getAllUsers)
+
+module.exports = router
+```
+
+En este apartado para terminar de enrutar nuestra API ecesitamos añadir esto ```app.use('/api', require('./api/routes/index'))``` antes de que nuestro servidor esté a la escucha, es decir, añdirlo a la función ```initializeExpressAndListen``` paa que nos quede algo así:
+
+```js
+const initializeExpressAndListen = () => {
+  try {
+    app.use(express.json())
+    app.use('/api', require('./api/routes/index'))
+    app.listen(3003, () => {
+      console.log('Server started')
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+```
+
+Una vez hecho esto podemos probar la ruta ```http://localhost:3000/api/user```en **Postman** y nos debería devolver un array vacío ([]), ya que aún no tenemos ningún dato en nuestra base de datos.
+
