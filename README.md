@@ -6,7 +6,6 @@ Pequeña guía de como debemos afrontar la creación de una API REST para una re
 
 ## **Index**
 
-
   - [Inicio de proyecto](#Inicio-de-proyecto)
   - [Creación de modelos](#Creación-de-modelos)
   - [Creación de controladores, CRUD básico y rutas correspondientes](#Creación-de-controladores-,-CRUD-básico,y-rutas-correspondientes)
@@ -498,4 +497,116 @@ const initializeExpressAndListen = () => {
 ```
 
 Una vez hecho esto podemos probar la ruta ```http://localhost:3000/api/user```en **Postman** y nos debería devolver un array vacío ([]), ya que aún no tenemos ningún dato en nuestra base de datos.
+
+Y nos saldría algoasí en Postamn:
+
+Image de Postman
+
+
+Ya tendríamos una ruta hecha para obtener todos los usuarios de nuestra página, nos quedaría implementra el resto del CRUD y nos debería quedar algo así:
+
+**user.controller.js**
+
+```js
+const User = require('../models/user')
+
+async function getAllUsers(req, res) {
+  try {
+    const users = await User.findAll({ paranoid: false })
+    if (users) {
+      return res.status(200).json(users)
+    } else {
+      return res.status(404).send('No users found')
+    }
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
+}
+
+async function getOneUser(req, res) {
+  try {
+    const user = await User.findByPk(req.params.id)
+    if (user) {
+      return res.status(200).json(user)
+    } else {
+      return res.status(404).send('User not found')
+    }
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
+}
+
+async function createUser(req, res) {
+  try {
+    const user = await User.create({
+      firstName: req.body.firstName,
+    })
+    return res.status(200).json({ message: 'User created', user: user })
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
+}
+
+async function updateUser(req, res) {
+  try {
+    const [userExist, user] = await User.update(req.body, {
+      returning: true,
+      where: {
+        id: req.params.id,
+      },
+    })
+    if (userExist !== 0) {
+      return res.status(200).json({ message: 'User updated', user: user })
+    } else {
+      return res.status(404).send('User not found')
+    }
+  } catch (error) {
+    return res.status(500).send(error.message)
+  }
+}
+
+async function deleteUser(req, res) {
+  try {
+    const user = await User.destroy({
+      where: {
+        id: req.params.id,
+      },
+    })
+    if (user) {
+      return res.status(200).json('User deleted')
+    } else {
+      return res.status(404).send('User not found')
+    }
+  } catch (error) {
+    return res.status(500).send(error.message)
+  }
+}
+
+module.exports = {
+  getAllUsers,
+  getOneUser,
+  createUser,
+  updateUser,
+  deleteUser,
+}
+```
+
+Y ahora nestro ```user.router.js``` aplicando lo mismo que hicimos antes pero para el resto de funciones tendríamos esto:
+
+```js
+const router = require('express').Router()
+
+const { getAllUsers, getOneUser, createUser, updateUser, deleteUser } = require('../controllers/user.controller.js')
+
+router.get('/', getAllUsers)
+router.get('/:id', getOneUser)
+router.post('/', createUser)
+router.put('/:id', updateUser)
+router.delete('/:id', deleteUser)
+
+module.exports = router
+```
+
+Sería hacer lo mismo pero para las otras entidades de nuestra API.
+Una vez que hayamos finalizado de crear todos los controladores y las rutas asociadas a cada uno de ellos a podemos pasar  establecer las relaciones existentes en nuestra Base de Datos.
 
