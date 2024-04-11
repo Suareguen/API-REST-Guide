@@ -608,5 +608,5 @@ module.exports = router
 ```
 
 Sería hacer lo mismo pero para las otras entidades de nuestra API.
-Una vez que hayamos finalizado de crear todos los controladores y las rutas asociadas a cada uno de ellos a podemos pasar  establecer las relaciones existentes en nuestra Base de Datos.
+Una vez que hayamos finalizado de crear todos los controladores y las rutas asociadas a cada uno de ellos a podemos pasar  establecer las relaciones existentes en nuestra Base de Datos. Para comprobar si esta bien en este proyecto ya disponemos dle proyecto completo con los controladores hechos al completo.
 
