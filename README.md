@@ -802,7 +802,7 @@ const signUp = async (req, res) => {
     });
 
     // Asociamos el contacto creado con el usuario creado utilizando la función setContact generada por Sequelize
-    await user.setContact(contact);
+    await contact.setUser(user);
 
     // Creamos el payload del token, incluyendo el email del usuario
     const payload = { email: req.body.email };
@@ -857,7 +857,7 @@ Nos debería quedar algo así:
 const router = require('express').Router()
 const { signUp } = require('../controllers/auh.controller.js')
 
-router.post('signup', signUp)
+router.post('/signup', signUp)
 
 module.exports = router
 ```
@@ -917,8 +917,8 @@ De la misma manera que hicimos con el ```signUp``` tenemos que crear la ruta que
 const router = require('express').Router()
 const { signUp, login } = require('../controllers/auh.controller.js')
 
-router.post('signup', signUp)
-router.post('login', login)
+router.post('/signup', signUp)
+router.post('/login', login)
 
 module.exports = router
 ```
@@ -929,9 +929,19 @@ Quedándonos las siguiente rutas (endpoints) para acceder a estos registros que 
 
 ```http://localhost:3000/api/auth/signUp```
 
+En el apartado ```Body``` seleccionamos la opción ```raw``` y en el desplegable de la derecha elegimos el formato ```JSON```, aquí es donde introduciremos los valores que el usuario va a registrar, como en nuestro caso en el modelo (tabla o entidad) de ```User``` tenemos los atributos o campos a rellenar de: name, email y password.
+
+Deberíamos tener algo así:
+
+Foto de Postman
+
 **Login**
 
 ```http://localhost:3000/api/auth/login```
+
+Siguiendo los mismos pasos que en el apartado anterior de la misma manera probamos nuestro ```login```solo que esta vez no pasaremo el parámetro ```name```, quedándonos añgo así:
+
+imagen postman
 
 
 

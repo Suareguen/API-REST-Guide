@@ -1,6 +1,6 @@
 // Importamos los modelos de usuario y contacto
 const User = require('../models/user.model');
-const Contact = require('../models/contactInfo.model');
+const ContactInfo = require('../models/contactInfo.model');
 
 // Importamos las librerías para manejar tokens y cifrado de contraseñas
 const jwt = require('jsonwebtoken');
@@ -11,7 +11,7 @@ const signUp = async (req, res) => {
   try {
     //Buscamos al usuario primero para erificar que no se haya registrado antes.
     const findUser = await User.findOne({
-      whee: {
+      where: {
         email: req.body.email
       }
     })
@@ -32,18 +32,18 @@ const signUp = async (req, res) => {
     });
 
     // Creamos una nueva entrada de contacto con los datos proporcionados
-    const contact = await Contact.create({
+    const contact = await ContactInfo.create({
       address: req.body.address
     });
 
     // Asociamos el contacto creado con el usuario creado utilizando la función setContact generada por Sequelize
-    await user.setContact(contact);
+    await contact.setUser(user);
 
     // Creamos el payload del token, incluyendo el email del usuario
     const payload = { email: req.body.email };
     // Firmamos el token con una clave secreta y establecemos un tiempo de expiración
     const token = jwt.sign(payload, 'secret', { expiresIn: '1h' });
-
+    console.log(token)
     // Si todo es correcto, devolvemos el token al usuario con un estado 200 (OK)
     return res.status(200).json({ token });  // ===> { token: token }
   } catch (error) {
