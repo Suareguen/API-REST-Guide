@@ -14,7 +14,7 @@ Pequeña guía de como debemos afrontar la creación de una API REST para una re
     - [Conexión a la base de datos](#Conexión-a-la-base-de-datos)
   - [Creación de modelos](#Creación-de-modelos)
     - [Definición de modelos](#Definición-de-modelos)
-    - [Sincroización de modelos en la BBDD](#Sincronización-de-modelos-en-la-BBDD)
+    - [Sincronización de modelos en la BBDD](#Sincronización-de-modelos-en-la-BBDD)
   - [Creación de controladores y rutas correspondientes](#Creación-de-controladores-y-rutas-correspondientes)
     - [Rutas](#Rutas)
     - [Ejemplos peticiones del CRUD por Postman](#Ejemplos-peticiones-del-CRUD-por-Postman)
@@ -371,7 +371,7 @@ const ContactInfo = connection.define('contactinfo', {
 module.exports = ContactInfo
 ```
 
-### Sincroización de modelos en la BBDD
+### Sincronización de modelos en la BBDD
 
 Una vez que tenemos nuestros modelos ya definido los que nos queda es que los mismos se nos creen en la base de datos, para ello necesitamos volver al achivo ```index.js``` que se encuentra en la carpeta **database**. Una vez que estemos en dicho archivo añadimos la siguiente función que por medio del método ```sync``` podremos sincronizar os modelos con la base de datos. Por lo tanto deberíamos añadir esta función en dicho archivo:
 
