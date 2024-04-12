@@ -11,10 +11,10 @@ Pequeña guía de como debemos afrontar la creación de una API REST para una re
   - [Inicio de proyecto](#Inicio-de-proyecto)
     - [Estructura de proyecto](#Estructura-de-proyecto)
     - [Iniciar servidor con Express JS](#Iniciar-servidor-con-Express-JS)
-    - [Conexión con la base de datos](#Conexión-de-la-base-de-datos)
+    - [Conexión a la base de datos](#Conexión-a-la-base-de-datos)
   - [Creación de modelos](#Creación-de-modelos)
     - [Definición de modelos](#Definición-de-modelos)
-    - [Sincronización de modelos en la BBDD](#Sincronización-de-modelos-en-la-BBDD)
+    - [Sincroización de modelos en la BBDD](#Sincronización-de-modelos-en-la-BBDD)
   - [Creación de controladores y rutas correspondientes](#Creación-de-controladores-y-rutas-correspondientes)
     - [Rutas](#Rutas)
     - [Ejemplos peticiones del CRUD por Postman](#Ejemplos-peticiones-del-CRUD-por-Postman)
@@ -23,7 +23,6 @@ Pequeña guía de como debemos afrontar la creación de una API REST para una re
   - [Middlewares](#Middlewares)
     - [Middleware de autenticación](#Middleware-de-autenticación)
     - [Verificación de rol](#Verificación-de-rol)
-
 
 ## Inicio de proyecto
 
