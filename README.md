@@ -11,6 +11,7 @@ Pequeña guía de como debemos afrontar la creación de una API REST para una re
   - [Creación de controladores, CRUD básico y rutas correspondientes](#Creación-de-controladores-,-CRUD-básico,y-rutas-correspondientes)
   - [Relations](#Relations)
   - [Login y SignUp](#Login-y-SignUp)
+  - [Middlewares](#Middlewares)
 
 
 ## Inicio de proyecto
@@ -945,6 +946,8 @@ imagen postman
 
 
 
+
+## Middlewares
 
 
 
