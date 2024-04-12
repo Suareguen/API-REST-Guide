@@ -48,5 +48,6 @@ function checkAdmin(req, res, next) {
 }
 
 module.exports = {
-  checkAuth
+  checkAuth,
+  checkAdmin
 }

@@ -950,6 +950,8 @@ imagen postman
 
 ## Middlewares
 
+### Middleware de autenticación
+
 A continuación, implementaremos medidas de seguridad en nuestras rutas para controlar el acceso a los recursos de la API. Específicamente, estableceremos middlewares que requerirán que los usuarios estén autenticados para acceder a ciertos recursos. Esto significa que solo los usuarios que hayan iniciado sesión y posean un token válido podrán realizar ciertas operaciones. Los usuarios que no dispongan de un token válido verán restringido su acceso, asegurando así que solo usuarios autorizados puedan interactuar con la API de formas específicas.
 
 Para ello creamos dentro de la carpeta ```middlewares``` un archivo ```auth.js```, lo abrimos y pasamos a crear una función ```checkAuth``` que verificara si el usuario tiene ```token``` y en caso de que lo tuviese nos dejaria acceder al recurso quedándonos algo así:
@@ -1017,4 +1019,93 @@ router.delete('/:id', checkAuth, deleteUser)
 module.exports = router
 ```
 
+### Verificación de rol
+
+Vamos a nuestro arcico ```auth.js``` y añadimos una función más que se llamará ```checkAdmin``` y nos comprobará si el rol del usuario es de ```admin```, protegiendo así las rutas a las que solo puedan acceder los administradores, quedándonos una función así:
+
+```js
+function checkAdmin(req, res, next) {
+  if (res.locals.user.role !== 'admin') {
+    return res.status(401).json('Admins only')
+  }
+  else {
+    next()
+  }
+}
+```
+
+E importamos el archivo al final teniendo algo así:
+
+```js
+const User = require('../models/user.model')
+const jwt = require('jsonwebtoken')
+
+
+function checkAuth(req, res, next) {
+  // Verificamos si la petición tiene el encabezado de autorización
+  if (!req.headers.authorization) {
+    // Si no se encuentra el encabezado de autorización, retorna un error 404
+    return res.status(404).send("Token not found");
+  }
+
+  // Utilizamos jwt.verify para validar el token proporcionado
+  jwt.verify(
+    req.headers.authorization, // El token extraído del encabezado de autorización
+    process.env.SECRET,        // La clave secreta para desencriptar el token, almacenada en variables de entorno
+    async (error, payload) => {  // Callback que maneja el resultado de la verificación
+      // Si hay un error en la verificación, como un token expirado o modificado
+      if (error) {
+        console.log(error.message);  // Imprime el mensaje de error en consola
+        // Retorna un error 401 indicando que el token no es válido
+        return res.status(401).send("Token not valid");
+      }
+      // Si el token es válido, busca al usuario correspondiente en la base de datos
+      const user = await User.findOne({
+        where: {
+          email: payload.email, // Utiliza el email contenido en el payload del token para buscar al usuario
+        },
+      });
+      // Si no se encuentra un usuario con ese email, retorna un error 401
+      if (!user) {
+        return res.status(401).send("Token not valid");
+      }
+      // Si se encuentra el usuario, lo almacena en el objeto res.locals para su uso en el siguiente middleware
+      res.locals.user = user;
+      // Llama a la función next para continuar con el próximo middleware en la cadena
+      next();
+    }
+  );
+}
+
+function checkAdmin(req, res, next) {
+  if (res.locals.user.role !== 'admin') {
+    return res.status(401).json('Admins only')
+  }
+  else {
+    next()
+  }
+}
+
+module.exports = {
+  checkAuth,
+  checkAdmin
+}
+```
+
+Vamos otra vez a la ruta del usuario donde implementamos el ```checkAuth``` y lo aplicamos justo después teniendo algo así:
+
+```js
+const router = require('express').Router()
+const { getAllUsers, getOneUser, createUser, updateUser, deleteUser } = require('../controllers/user.controller.js')
+const { checkAuth, checkAdmin } = require('../middlewares/auth.js')
+
+// Añadimos nuestro middleware después del checkAuth, ahora la ruta en la que aplicamos el checkAdmin comprobará primero si el usuario tiene token (tiene que estar logeado) y después comprueba si su rol en la Base de Datos es el de Admin en caso de serlo puede acceder a esa recurso si no tienes ese rol si podrás.
+router.get('/', checkAuth, checkAdmin, getAllUsers)
+router.get('/:id', checkAuth, getOneUser)
+router.post('/', checkAuth, createUser)
+router.put('/:id', checkAuth, updateUser)
+router.delete('/:id', checkAuth, deleteUser)
+
+module.exports = router
+```
 Con esto sería todo para nuestra API, en el código lo tienen todo implementado., la idea es que lo vayan haciendo ustedes y echándole un ojo al repositorio en caso de que sea necesario.
