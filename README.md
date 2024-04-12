@@ -9,6 +9,7 @@ Pequeña guía de como debemos afrontar la creación de una API REST para una re
   - [Inicio de proyecto](#Inicio-de-proyecto)
   - [Creación de modelos](#Creación-de-modelos)
   - [Creación de controladores, CRUD básico y rutas correspondientes](#Creación-de-controladores-,-CRUD-básico,y-rutas-correspondientes)
+  - [Relations](#Relations)
 
 
 ## Inicio de proyecto
@@ -99,9 +100,12 @@ Abrimos VS Code desde la ruta en la que estábamos anteriormente, es decir, en l
 
 Una vez que tenemos abierto nuestro editor de texto procedemos a seleccionar el archivo ```index.js``` (**NO EL DE LA CARPETA database**) e iniciamos la escucha de nuestro servidor de la siguente manera:
 
-- Importamos ```express``` añadiendo al archivo:
+- Importamos ```express```, creamos su instancia ```app``` y nos importamos ```cors``` y ```morgan``` añadiendo al archivo:
   ```js
   const express = require('express')
+  const app = express()
+  const cors = require('cors')
+  const morgan = require('morgan')
   ```
 
 - Ahora creamos una función que llamaremos ```initializeAnListenExpress``` en donde crearemos una instacia de express que llamaremos ```app```, aplicaremos los diferentes middlewares como morgan, cors, etc., así como por último la escucha de nuestro servidor en el puerto 3000. Deberíamos tener algo como esto:
@@ -139,7 +143,11 @@ Lo que nos queda es arrancar nuestro servidor por medio del comando ```node --wa
 **RECORDATORIO:** ejecutamos desde la ruta principal de nuestra aplicación que es aquella en donde si hacemos ```ls``` deberíamos ver el package.json como uno de los elementos que están en esa carpeta.
 Debería aparecernos por consola algo como esto:
 
-Imagen
+```bash
+node --watch index.js
+Restarting 'index.js'
+Server started
+```
 
 Ya tenemos nuestro servidor a la escucha!!!!
 
@@ -155,7 +163,7 @@ Para ello primero en el archivo ```index.js``` de la carpeta **database** creamo
 const { Sequelize } = require('sequelize');
 
 // Creamos una nueva instancia de Sequelize para manejar la conexión con una base de datos MySQL, es decir, establecemos las credenciales y demás opciones necesarias para la conexión
-const connection = new Sequelize('npmbreDeLaBasedeDatos', 'usuario', 'contraseña', {
+const connection = new Sequelize('nombreDeLaBasedeDatos', 'usuario', 'contraseña', {
   host: 'localhost', // Dirección del servidor de la base de datos
   dialect: 'mysql', // Especificamos que usaremos MySQL como el sistema de gestión de base de datos
   port: 3306,       // Puerto por el que se conecta al servidor MySQL, 3306 es el predeterminado para MySQL
@@ -187,21 +195,42 @@ module.exports = {
 
 Y se nos debería quedar una archivo así:
 
-Imagen
+```js
+const { Sequelize } = require('sequelize');
+
+const connection = new Sequelize('nombreDeLaBasedeDatos', 'usuario', 'contraseña', {
+  host: 'localhost', // Dirección del servidor de la base de datos
+  dialect: 'mysql', // Especificamos que usaremos MySQL como el sistema de gestión de base de datos
+  port: 3306,       // Puerto por el que se conecta al servidor MySQL, 3306 es el predeterminado para MySQL
+  logging: false    // Desactivamos el logging para no mostrar los detalles de las consultas SQL en la consola
+});
+
+const checkDb = async () => {
+  try {
+    await connection.authenticate()
+    console.log('Connection to DB succesfull')
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+module.exports = {
+  checkDb,
+  connection
+}
+```
 
 Para finalizar nos quedaría ir a nuestro archivo ```index.js``` principal, nos importamos las funciones que acabamos de crear y creamos una función ```checkAndSyncMySQL``` para realizar nuestra conexión a la base de datos de una manera más unificada (esto de cara a futuro) y deberíamos tener algo así:
 
 ```js
-
 const {
   connection,
-  checkDb,
-  syncModels
+  checkDb
 } = require('./database/index.js')
 
 async function checkAndSyncMySQL() {
     try {
-          await checkConnection()
+          await checkDb()
     } catch (error) {
         throw error
     }
@@ -220,7 +249,14 @@ const startApi = async () => {
 }
 ```
 
-Y si todo va bien deberíamos tener ya la conexión con la base de datos hecha.
+Y si todo va bien deberíamos tener ya la conexión con la base de datos hecha, simplemente al arrancar el servidor debería mostrarnos esto:
+
+```bash
+node --watch index.js
+Restarting 'index.js'
+Connection to DB succesfull
+Server started
+```
 
 ## Creación de modelos
 
@@ -235,7 +271,7 @@ Para ello en la carpeta de ```models``` creada anteriormente creamos el archivo 
 const { DataTypes } = require('sequelize');
 
 // Importamos el objeto connection desde una ruta relativa, que maneja la conexión con nuestra base de datos
-const { connection } = require('../../databse/index');
+const { connection } = require('../../database/index');
 
 // Definimos un modelo 'User' usando el objeto connection que se refiere a la tabla 'user' en la base de datos
 const User = connection.define('user', {
@@ -259,7 +295,7 @@ El resto de modelos siguiendo la misma estructura deberían quedarnos algo así:
 
 ```js
 const { DataTypes } = require('sequelize')
-const { connection } = require('../../databse/index')
+const { connection } = require('../../database/index')
 
 
 const Tweet = connection.define('tweet', {
@@ -275,16 +311,15 @@ const Tweet = connection.define('tweet', {
 module.exports = Tweet
 ```
 
-**Class**
+**Tag**
 
 ```js
 const { DataTypes } = require('sequelize')
-const { connection } = require('../../databse/index')
+const { connection } = require('../../database/index')
 
-
-const Class = connection.define('class', {
+const Tag = connection.define('tag', {
   name: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
   }
 },
   {
@@ -292,14 +327,14 @@ const Class = connection.define('class', {
   }
 )
 
-module.exports = Class
+module.exports = Tag
 ```
 
 **ContactInfo**
 
 ```js
 const { DataTypes } = require('sequelize')
-const { connection } = require('../../databse/index')
+const { connection } = require('../../database/index')
 
 
 const ContactInfo = connection.define('contactinfo', {
@@ -365,14 +400,14 @@ Solo nos quedaría ahora ir al archivo ```relations.js``` y añadir dentro una f
 
 ```js
 const User = require('../api/models/user.model.js')
-const Tweet = require('../api/models/tweets.model.js')
-const ContactInfo = require('../api/models/contact_info.model.js')
-const Class = require('../api/models/classes.model.js')
-const UserClass = require('../api/models/user_class.model.js')
+const Tweet = require('../api/models/tweet.model.js')
+const ContactInfo = require('../api/models/contactInfo.model.js')
+const Tag = require('../api/models/tag.model.js')
 
 const initializeRelations = () => {
   try {
     //here the relations
+    console.log('Relations added to models')
   } catch (error) {
     console.log(error)
   }
@@ -404,6 +439,11 @@ Debería salirnos por consola algo asi por consola:
 
 ![consola con el servidor arrancado y las sincronizaciones hechas](/home/suarenguen/code/API-REST-Guide/images/serverStarted.png)
 
+```bash
+Connection to DB succesfull
+Models added
+Server started
+```
 Y además si abrimos Table Plus deberían aparecernos las tablas ya definidas en nuestra base de datos de esta manera:
 
 Imagen de table plus
@@ -447,12 +487,12 @@ router.get('', (request, response) => {
 module.exports = router
 ```
 
-por ahora el segundo parámetro que pasamos al método ```get``` es una función callback añadida directamente, pero la idea es crear ahora en el controlador de usuario una función que ejcutemos en vez de esta que me hemos escrito directamente.
+Por ahora el segundo parámetro que pasamos al método ```get``` es una función callback añadida directamente, pero la idea es crear ahora en el controlador de usuario una función que ejcutemos en vez de esta que me hemos escrito directamente.
 
 Por ello ahroa iremos al ```user.controller.js``` y en el mismo creamos la siguiente función:
 
 ```js
-const User = require('../models/user.model')
+const User = require('../models/user.model.js')
 
 const getAllUsers = async (request, response) => {
   try {
@@ -466,7 +506,7 @@ const getAllUsers = async (request, response) => {
 // Exportamos la función que hemos creado
 
 module.exports = {
-  getOneUser
+  getAllUsers
 }
 ```
 
@@ -498,9 +538,13 @@ const initializeExpressAndListen = () => {
 
 Una vez hecho esto podemos probar la ruta ```http://localhost:3000/api/user```en **Postman** y nos debería devolver un array vacío ([]), ya que aún no tenemos ningún dato en nuestra base de datos.
 
+**NOTA:** ¿Cómo podemos saber cual es la rta para acceder a nuestro recurso?
+En nuestro caso con la última línea que hemos añadido ```app.use('/api', require('./api/routes/index'))``` nos da la entrada a nuestro router que en nuestro caso al trabajar en local siempre empezará así (cuando tengamos la API deployada este inicio de ruta cabiará pero nos a proporciona el servicio que usemos para subir nuestra API): ```http://localhost:3000``` y la continuación de nuestra ruta la especificamos antes que sería ```api``` quedándonos la ruta por ahora así: ``` http://localhost:3000/api```, ahora nos falta ir a nuestro ```index.s```de la carpeta de router dentro de ```api``` y ver las rutas de las que disponemos, en nuestro caso solo tenemos ```user``` por ahora así que nos quedaría la siguiente ruta: ```http://localhost:3000/api/user```.
+Ahora bien si vamos a nuestro ```user.router.js``` tenemos una ruta únicamente y la especifico como una string vacía ```""```, esto nos dice que esa ruta termina sin añadir nada, en caso de no tener una string vacía y tuviésemos ```"users"``` nuestra ruta sería: ```http://localhost:3000/api/user/users```, pero como no es así nos quedamos con: ```http://localhost:3000/api/user```.
+
 Y nos saldría algoasí en Postamn:
 
-Image de Postman
+IMAGEN DE POSTMAN
 
 
 Ya tendríamos una ruta hecha para obtener todos los usuarios de nuestra página, nos quedaría implementra el resto del CRUD y nos debería quedar algo así:
@@ -508,7 +552,7 @@ Ya tendríamos una ruta hecha para obtener todos los usuarios de nuestra página
 **user.controller.js**
 
 ```js
-const User = require('../models/user')
+const User = require('../models/user.model.js')
 
 async function getAllUsers(req, res) {
   try {
@@ -539,7 +583,7 @@ async function getOneUser(req, res) {
 async function createUser(req, res) {
   try {
     const user = await User.create({
-      firstName: req.body.firstName,
+      name: req.body.name,
     })
     return res.status(200).json({ message: 'User created', user: user })
   } catch (error) {
@@ -609,4 +653,103 @@ module.exports = router
 
 Sería hacer lo mismo pero para las otras entidades de nuestra API.
 Una vez que hayamos finalizado de crear todos los controladores y las rutas asociadas a cada uno de ellos a podemos pasar  establecer las relaciones existentes en nuestra Base de Datos. Para comprobar si esta bien en este proyecto ya disponemos dle proyecto completo con los controladores hechos al completo.
+
+### Ejemplos peticiones del CRUD por Postman
+
+**getAllUsers**
+
+```
+http://localhost:3000/api/user
+```
+
+**getOneUser**
+
+```
+http://localhost:3000/api/user/1
+```
+
+**createUser**
+
+```
+http://localhost:3000/api/user
+```
+
+**gupdateUser**
+
+```
+http://localhost:3000/api/user/1
+```
+
+**deleteUser**
+
+```
+http://localhost:3000/api/user/1
+```
+
+## Relations
+
+Ahora procederemos a crear las relaciones entre nuestros modelos (tablas o entidades). Para ello iremos al archivo ```relations.js``` y en la función que especificamos ```initializeRelations``` establecemos las relaciones.
+
+**IMPORTANTE:** VAMOS A TENER UNA RELACIÓN DE CADA TIPO.
+
+Primero antes que nada vamos a definir dichas relaciones, en nuestro caso vamos a tener:
+
+   - One to One: entre ```User``` y ```ContactInfo```, ya que un usuario va a tener una única información de contacto y dicha información de contacto pertenece a un usuario únicamente.
+
+  ```js
+    User.hasOne(ContactInfo)
+    ContactInfo.belongsTo(User)
+  ```
+
+   - One to Many: entre ```User``` y ```Tweet```, ya que un usuario va a tener muchos tweets pero cada tweet va  apertenecer a solo un usuario.
+
+  ```js
+    User.hasMany(Tweet)
+    Tweet.belongsTo(User)
+  ```
+
+   - Many to Many: entre ```Tweet``` y ```Tag```, ya que un tweet va a poder tener muchos tags y cada tag va a poder pertenecer a muchos tweets.
+
+  ```js
+    Tweet.belongsToMany(Tag)
+    Tag.belongsToMany(Tweet)
+  ```
+
+
+Se nos quedaría el archivo así:
+
+```js
+const User = require('../api/models/user.model.js')
+const Tweet = require('../api/models/tweet.model.js')
+const ContactInfo = require('../api/models/contactInfo.model.js')
+const Tag = require('../api/models/tag.model.js')
+
+const initializeRelations = () => {
+  try {
+    //here the relations
+
+    // One to One
+    User.hasOne(ContactInfo)
+    ContactInfo.belongsTo(User)
+
+    // One to Many
+    User.hasMany(Tweet)
+    Tweet.belongsTo(User)
+
+    // Many to Many
+
+    Tweet.belongsToMany(Tag, { through: 'tweet_tag' })
+    Tag.belongsToMany(Tweet, { through: 'tweet_tag' })
+    console.log('Relations added to models')
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+module.exports = initializeRelations
+```
+
+### Middlewares y Autenticación
+
+Dentro de la carpeta ```api```
 
