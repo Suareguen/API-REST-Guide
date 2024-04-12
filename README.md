@@ -10,7 +10,7 @@ Pequeña guía de como debemos afrontar la creación de una API REST para una re
 
   - [Inicio de proyecto](#Inicio-de-proyecto)
   - [Creación de modelos](#Creación-de-modelos)
-  - [Creación de controladores CRUD básico y rutas correspondientes](#Creación-de-controladores-CRUD-básico,y-rutas-correspondientes)
+  - [Creación de controladores y rutas correspondientes](#Creación-de-controladores-y-rutas-correspondientes)
   - [Relations](#Relations)
   - [Login y SignUp](#Login-y-SignUp)
   - [Middlewares](#Middlewares)
