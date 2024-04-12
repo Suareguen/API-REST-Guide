@@ -2,8 +2,6 @@
 
 Pequeña guía de como debemos afrontar la creación de una API REST para una red social al estilo de la antigua Twitter. Tendremos tres modelos (entidades o tablas) en nuestra API que serán las de: usuario, tweets, informacion de contacto del usuario (contactInfo) y comentarios. Al disponer de 4 modelos de inicio podemos definir que tendremos 4 controladores y 4 rutas asociadas a cada uno de los modelos. En caso de tener mas modelos o menos ajustaríamos ese numero, para 3 modelos tres controladores y 3 rutas, etc. Esto sería establecido de inicio a no ser que se especificase lo contrario al inicio del proyecto, ya cada proyecto tiene su propio contexto, objetivos y metodologías, pero podemos decir que en nuestro caso al tener 4 modelos disponemos de 4 rutas y 4 controladores.
 
-**Añadir ```.gitignre```**
-
 ## **Index**
 
   - [Inicio de proyecto](#Inicio-de-proyecto)
@@ -152,7 +150,6 @@ Server started
 ```
 
 Ya tenemos nuestro servidor a la escucha!!!!
-
 
 ### Conexión a la base de datos
 
@@ -449,7 +446,7 @@ async function checkAndSyncMySQL() {
 Una vez hemos añadido dicha función volvemos a arrancar nuestro servidor por medio de ```node --watch index.js```.
 Debería salirnos por consola algo asi por consola:
 
-![consola con el servidor arrancado y las sincronizaciones hechas](/home/suarenguen/code/API-REST-Guide/images/serverStarted.png)
+![https://myoctocat.com/assets/images/base-octocat.svg](https://github.com/Suareguen/API-REST-Guide/blob/main/images/serverStarted.png)
 
 ```bash
 Connection to DB succesfull
@@ -458,8 +455,7 @@ Server started
 ```
 Y además si abrimos Table Plus deberían aparecernos las tablas ya definidas en nuestra base de datos de esta manera:
 
-Imagen de table plus
-
+![https://github.com/Suareguen/API-REST-Guide/blob/main/images/serverStarted.png](https://github.com/Suareguen/API-REST-Guide/blob/main/images/tableplus.png)
 
 ## Creación de controladores, CRUD básico y rutas correspondientes
 
@@ -553,11 +549,6 @@ Una vez hecho esto podemos probar la ruta ```http://localhost:3000/api/user```en
 **NOTA:** ¿Cómo podemos saber cual es la rta para acceder a nuestro recurso?
 En nuestro caso con la última línea que hemos añadido ```app.use('/api', require('./api/routes/index'))``` nos da la entrada a nuestro router que en nuestro caso al trabajar en local siempre empezará así (cuando tengamos la API deployada este inicio de ruta cabiará pero nos a proporciona el servicio que usemos para subir nuestra API): ```http://localhost:3000``` y la continuación de nuestra ruta la especificamos antes que sería ```api``` quedándonos la ruta por ahora así: ``` http://localhost:3000/api```, ahora nos falta ir a nuestro ```index.s```de la carpeta de router dentro de ```api``` y ver las rutas de las que disponemos, en nuestro caso solo tenemos ```user``` por ahora así que nos quedaría la siguiente ruta: ```http://localhost:3000/api/user```.
 Ahora bien si vamos a nuestro ```user.router.js``` tenemos una ruta únicamente y la especifico como una string vacía ```""```, esto nos dice que esa ruta termina sin añadir nada, en caso de no tener una string vacía y tuviésemos ```"users"``` nuestra ruta sería: ```http://localhost:3000/api/user/users```, pero como no es así nos quedamos con: ```http://localhost:3000/api/user```.
-
-Y nos saldría algoasí en Postamn:
-
-IMAGEN DE POSTMAN
-
 
 Ya tendríamos una ruta hecha para obtener todos los usuarios de nuestra página, nos quedaría implementra el resto del CRUD y nos debería quedar algo así:
 
@@ -674,11 +665,14 @@ Una vez que hayamos finalizado de crear todos los controladores y las rutas asoc
 http://localhost:3000/api/user
 ```
 
+![https://github.com/Suareguen/API-REST-Guide/blob/main/images/tableplus.png](https://github.com/Suareguen/API-REST-Guide/blob/main/images/Postman/getAllUsers.png)
 **getOneUser**
 
 ```
 http://localhost:3000/api/user/1
 ```
+
+![https://github.com/Suareguen/API-REST-Guide/blob/main/images/Postman/getAllUsers.png](https://github.com/Suareguen/API-REST-Guide/blob/main/images/Postman/getOneUser.png)
 
 **createUser**
 
@@ -686,17 +680,23 @@ http://localhost:3000/api/user/1
 http://localhost:3000/api/user
 ```
 
-**gupdateUser**
+![https://github.com/Suareguen/API-REST-Guide/blob/main/images/Postman/getAllUsers.png](https://github.com/Suareguen/API-REST-Guide/blob/main/images/Postman/createUser.png)
+
+**updateUser**
 
 ```
 http://localhost:3000/api/user/1
 ```
+
+![https://github.com/Suareguen/API-REST-Guide/blob/main/images/Postman/getAllUsers.png](https://github.com/Suareguen/API-REST-Guide/blob/main/images/Postman/updateUser.png)
 
 **deleteUser**
 
 ```
 http://localhost:3000/api/user/1
 ```
+
+![https://github.com/Suareguen/API-REST-Guide/blob/main/images/Postman/getAllUsers.png](https://github.com/Suareguen/API-REST-Guide/blob/main/images/Postman/deleteUser.png)
 
 ## Relations
 
@@ -938,7 +938,7 @@ En el apartado ```Body``` seleccionamos la opción ```raw``` y en el desplegable
 
 Deberíamos tener algo así:
 
-Foto de Postman
+![https://github.com/Suareguen/API-REST-Guide/blob/main/images/Postman/deleteUser.png](https://github.com/Suareguen/API-REST-Guide/blob/main/images/Postman/signup.png)
 
 **Login**
 
@@ -946,7 +946,7 @@ Foto de Postman
 
 Siguiendo los mismos pasos que en el apartado anterior de la misma manera probamos nuestro ```login```solo que esta vez no pasaremo el parámetro ```name```, quedándonos algo así:
 
-imagen postman
+![https://github.com/Suareguen/API-REST-Guide/blob/main/images/Postman/signup.png](https://github.com/Suareguen/API-REST-Guide/blob/main/images/Postman/login.png)
 
 ## Middlewares
 
