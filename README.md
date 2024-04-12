@@ -10,7 +10,7 @@ Pequeña guía de como debemos afrontar la creación de una API REST para una re
 
   - [Inicio de proyecto](#Inicio-de-proyecto)
   - [Creación de modelos](#Creación-de-modelos)
-  - [Creación de controladores, CRUD básico y rutas correspondientes](#Creación-de-controladores-,-CRUD-básico,y-rutas-correspondientes)
+  - [Creación de controladores, CRUD básico y rutas correspondientes](#Creación-de-controladores-CRUD-básico,y-rutas-correspondientes)
   - [Relations](#Relations)
   - [Login y SignUp](#Login-y-SignUp)
   - [Middlewares](#Middlewares)
@@ -461,7 +461,7 @@ Y además si abrimos Table Plus deberían aparecernos las tablas ya definidas en
 
 ![https://github.com/Suareguen/API-REST-Guide/blob/main/images/serverStarted.png](https://github.com/Suareguen/API-REST-Guide/blob/main/images/tableplus.png)
 
-## Creación de controladores, CRUD básico y rutas correspondientes
+## Creación de controladores CRUD básico y rutas correspondientes
 
 Pasaremos ahora a crear un CRUD básico para nuestro modelo de ```User```, primero vamos a definir una ruta básica hacia nuestro controlador de usuario, para ello dentro de la carpeta ```api``` tendremos la carpeta ```controllers```, en dicha carpeta creamos un archivo ```user.controller.js``` y dentro del mismo antes que nada nos importamos el modelo del usuario de la siguiente manera:
 
