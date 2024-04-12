@@ -9,7 +9,7 @@ Pequeña guía de como debemos afrontar la creación de una API REST para una re
 ## **Index**
 
   - [Inicio de proyecto](#Inicio-de-proyecto)
-    - [Instalación package.json, instalación de paquetes y creación de carpetas](#Instalación-package.json,-instalación-de-paquetes-y-creación-de-carpetas)
+    - [Estructura de proyecto](#Estructura-de-proyecto)
     - [Iniciar servidor con Express JS](#Iniciar-servidor-con-Express-JS)
     - [Conexión con la base de datos](#Conexión-de-la-base-de-datos)
   - [Creación de modelos](#Creación-de-modelos)
@@ -21,13 +21,13 @@ Pequeña guía de como debemos afrontar la creación de una API REST para una re
   - [Relations](#Relations)
   - [Login y SignUp](#Login-y-SignUp)
   - [Middlewares](#Middlewares)
-    - [Middlewares de autenticación](#Middlewares-de-autenticación)
+    - [Middleware de autenticación](#Middleware-de-autenticación)
     - [Verificación de rol](#Verificación-de-rol)
 
 
 ## Inicio de proyecto
 
-### Instalación package.json, instalación de paquetes y creación de carpetas
+### Estructura de proyecto
 
 Por medio de nuestra terminal accedemos al directorio (carpeta) donde queremos crear el proyecto y por medio del siguiente comando en consola creamos la carpeta donde residirá nuestro proyecto:
 
