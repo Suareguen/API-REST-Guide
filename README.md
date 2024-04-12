@@ -10,6 +10,7 @@ Pequeña guía de como debemos afrontar la creación de una API REST para una re
   - [Creación de modelos](#Creación-de-modelos)
   - [Creación de controladores, CRUD básico y rutas correspondientes](#Creación-de-controladores-,-CRUD-básico,y-rutas-correspondientes)
   - [Relations](#Relations)
+  - [Login y SignUp](#Login-y-SignUp)
 
 
 ## Inicio de proyecto
@@ -278,15 +279,21 @@ const User = connection.define('user', {
   // Definimos una columna 'name' para almacenar el nombre del usuario
   name: {
     type: DataTypes.STRING // Establece el tipo de dato como cadena de texto
-  }
+  },
+  email: {
+    type: DataTypes.STRING // Establece el tipo de dato como cadena de texto
+  },
+  password: {
+    type: DataTypes.STRING // Establece el tipo de dato como cadena de texto
+  },
 },
-{
-  // Configuración adicional para el modelo
-  timestamps: false // Desactiva la creación automática de las columnas 'createdAt' y 'updatedAt'
-});
+  {
+    // Configuración adicional para el modelo
+    timestamps: false // Desactiva la creación automática de las columnas 'createdAt' y 'updatedAt'
+  });
 
 // Exportamos el modelo 'User' para poder usarlo en otras partes de la aplicación
-module.exports = User;
+module.exports = User
 ```
 
 El resto de modelos siguiendo la misma estructura deberían quedarnos algo así:
@@ -711,8 +718,8 @@ Primero antes que nada vamos a definir dichas relaciones, en nuestro caso vamos 
    - Many to Many: entre ```Tweet``` y ```Tag```, ya que un tweet va a poder tener muchos tags y cada tag va a poder pertenecer a muchos tweets.
 
   ```js
-    Tweet.belongsToMany(Tag)
-    Tag.belongsToMany(Tweet)
+    Tweet.belongsToMany(Tag, { through: 'tweet_tag' })
+    Tag.belongsToMany(Tweet, { through: 'tweet_tag' })
   ```
 
 
@@ -749,7 +756,78 @@ const initializeRelations = () => {
 module.exports = initializeRelations
 ```
 
-### Middlewares y Autenticación
+## Login y SignUp
 
-Dentro de la carpeta ```api```
+Pasamos a crear nuestras funciones de registro y login en nuestra API, para ello en nuestra carpeta ```controllers``` creamos un archivo ```auth.controller.js```.
+
+Una vezen dcho archivo pasamos a crear nuestra función de ```SignUp```, posteriormente pasaremos a la creación del ```Login```.
+
+
+```js
+// Importamos los modelos de usuario y contacto
+const User = require('../models/user.model');
+const Contact = require('../models/contact.model');
+
+// Importamos las librerías para manejar tokens y cifrado de contraseñas
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
+// Definimos la función signUp, que será una función asincrónica para manejar la creación de usuarios
+const signUp = async (req, res) => {
+  try {
+    const existingUser = await User.findOne({
+      whee: {
+        email: req.body.email
+      }
+    })
+
+    if(existingUser) {
+      return res.status(409)json({ messae: 'User already exits'})
+    }
+    // Generamos una 'sal' para el cifrado de la contraseña. Esto ayuda a asegurar la contraseña aún más
+    const salt = bcrypt.genSaltSync(parseInt('10'));
+    // Ciframos la contraseña que viene en el cuerpo de la solicitud (req.body.password) usando la 'sal' generada
+    req.body.password = bcrypt.hashSync(req.body.password, salt);
+
+    // Creamos un nuevo usuario con los datos proporcionados en la solicitud
+    const user = await User.create({
+      email: req.body.email,
+      password: req.body.password,
+      name: req.body.name
+    });
+
+    // Creamos una nueva entrada de contacto con los datos proporcionados
+    const contact = await Contact.create({
+      address: req.body.address
+    });
+
+    // Asociamos el contacto creado con el usuario creado utilizando la función setContact generada por Sequelize
+    await user.setContact(contact);
+
+    // Creamos el payload del token, incluyendo el email del usuario
+    const payload = { email: req.body.email };
+    // Firmamos el token con una clave secreta y establecemos un tiempo de expiración
+    const token = jwt.sign(payload, 'secret', { expiresIn: '1h' });
+
+    // Si todo es correcto, devolvemos el token al usuario con un estado 200 (OK)
+    return res.status(200).json({ token });  // === { token: token }
+  } catch (error) {
+    // Si hay un error, lo registramos y devolvemos un error 500 (Error interno del servidor)
+    console.log('Error signing up user');
+    return res.status(500).json(error);
+  }
+}
+
+// Exportamos la función signUp para que pueda ser utilizada en otros archivos
+module.exports = {
+  signUp
+}
+```
+
+
+Ahora que tenemos nuestro SignUp vamos a necesitar una ruta para poder ejecutar dicha función y acceder al recurso que necesitamos, en este caso necesitamos acceder al usuario para comprobar que existe el usuario en nuestra BBDD y en caso de que exita no registrar al mismo usuario varias veces.
+
+
+
+
 
