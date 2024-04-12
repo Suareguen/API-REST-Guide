@@ -939,7 +939,7 @@ Foto de Postman
 
 ```http://localhost:3000/api/auth/login```
 
-Siguiendo los mismos pasos que en el apartado anterior de la misma manera probamos nuestro ```login```solo que esta vez no pasaremo el parámetro ```name```, quedándonos añgo así:
+Siguiendo los mismos pasos que en el apartado anterior de la misma manera probamos nuestro ```login```solo que esta vez no pasaremo el parámetro ```name```, quedándonos algo así:
 
 imagen postman
 
