@@ -766,7 +766,7 @@ Una vezen dcho archivo pasamos a crear nuestra función de ```SignUp```, posteri
 ```js
 // Importamos los modelos de usuario y contacto
 const User = require('../models/user.model');
-const Contact = require('../models/contact.model');
+const Contact = require('../models/contactInfo.model');
 
 // Importamos las librerías para manejar tokens y cifrado de contraseñas
 const jwt = require('jsonwebtoken');
@@ -826,6 +826,44 @@ module.exports = {
 
 
 Ahora que tenemos nuestro SignUp vamos a necesitar una ruta para poder ejecutar dicha función y acceder al recurso que necesitamos, en este caso necesitamos acceder al usuario para comprobar que existe el usuario en nuestra BBDD y en caso de que exita no registrar al mismo usuario varias veces.
+
+Vamos a nuestra carpeta ```routes``` y en nuestro ```index.js``` añadimos la siguiente ruta:
+
+```js
+router.use('auth', require('./auth.router.js'))
+```
+
+y nos quedaría así el ```index.js```:
+
+```js
+// Importamos el módulo de enrutamiento de Express y creamos un enrutador.
+const router = require('express').Router();
+
+// Usamos el enrutador para manejar todas las peticiones dirigidas a '/user' usando el enrutador definido en 'user.router'.
+router.use('/user', require('./user.router'))
+router.use('auth', require('./auth.router.js'))
+
+// Exportamos el enrutador para que pueda ser utilizado por otros archivos en nuestra aplicación.
+module.exports = router;
+```
+
+
+
+Una vez hecho esto creamos en la misma carpeta ```routes``` un archivo ```auth.router.js```, lo abrimos y creamos la ruta perteneciente a este ```signUp```.
+
+Nos debería quedar algo así:
+
+```js
+const router = require('express').Router()
+const { signUp } = require('../controllers/auh.controller.js')
+
+router.post('signup', signUp)
+
+module.exports = router
+```
+
+
+
 
 
 

@@ -1,6 +1,6 @@
 // Importamos los modelos de usuario y contacto
 const User = require('../models/user.model');
-const Contact = require('../models/contact.model');
+const Contact = require('../models/contactInfo.model');
 
 // Importamos las librerías para manejar tokens y cifrado de contraseñas
 const jwt = require('jsonwebtoken');
@@ -45,7 +45,7 @@ const signUp = async (req, res) => {
     const token = jwt.sign(payload, 'secret', { expiresIn: '1h' });
 
     // Si todo es correcto, devolvemos el token al usuario con un estado 200 (OK)
-    return res.status(200).json({ token });  // === { token: token }
+    return res.status(200).json({ token });  // ===> { token: token }
   } catch (error) {
     // Si hay un error, lo registramos y devolvemos un error 500 (Error interno del servidor)
     console.log('Error signing up user');
