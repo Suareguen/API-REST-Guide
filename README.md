@@ -1017,3 +1017,4 @@ router.delete('/:id', checkAuth, deleteUser)
 module.exports = router
 ```
 
+Con esto sería todo para nuestra API, en el código lo tienen todo implementado., la idea es que lo vayan haciendo ustedes y echándole un ojo al repositorio en caso de que sea necesario.
