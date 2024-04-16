@@ -788,7 +788,7 @@ const bcrypt = require('bcrypt');
 const signUp = async (req, res) => {
   try {
     const existingUser = await User.findOne({
-      whee: {
+      where: {
         email: req.body.email
       }
     })
