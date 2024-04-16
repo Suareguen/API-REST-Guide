@@ -58,14 +58,7 @@ Este comando nos creará el package.json y al poner ```-y``` damos unos valores 
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "morgan": "^1.10.0",
-    "mysql2": "^3.9.4",
-    "sequelize": "^6.37.2"
-  }
+  "license": "ISC"
 }
 ```
 
